@@ -27,6 +27,14 @@ sealed interface ElementMaskComputation<E: Number> {
     data class Not<E: Number>(
         val argument: ElementMaskComputation<E>
     ) : ElementMaskComputation<E>
+    data class And<E: Number>(
+        val left: ElementMaskComputation<E>,
+        val right: ElementMaskComputation<E>,
+    ) : ElementMaskComputation<E>
+    data class Or<E: Number>(
+        val left: ElementMaskComputation<E>,
+        val right: ElementMaskComputation<E>,
+    ) : ElementMaskComputation<E>
     data class Comparison<E: Number>(
         val operator: VectorOperators.Comparison,
         val left: ElementComputation<E>,
@@ -46,9 +54,18 @@ operator fun <E: Number> VectorOperators.Comparison.invoke(left: ElementComputat
     ElementMaskComputation.Comparison(this, left, right)
 
 operator fun <E: Number> ElementComputation<E>.plus(other: ElementComputation<E>): ElementComputation<E> = VectorOperators.ADD(this, other)
+operator fun <E: Number> ElementComputation<E>.minus(other: ElementComputation<E>): ElementComputation<E> = VectorOperators.SUB(this, other)
 operator fun <E: Number> ElementComputation<E>.times(other: ElementComputation<E>): ElementComputation<E> = VectorOperators.MUL(this, other)
+operator fun <E: Number> ElementComputation<E>.div(other: ElementComputation<E>): ElementComputation<E> = VectorOperators.DIV(this, other)
 operator fun <E: Number> ElementComputation<E>.unaryMinus(): ElementComputation<E> = VectorOperators.NEG(this)
 
 operator fun <E: Number> ElementMaskComputation<E>.not(): ElementMaskComputation<E> = ElementMaskComputation.Not(this)
+infix fun <E: Number> ElementMaskComputation<E>.and(other: ElementMaskComputation<E>): ElementMaskComputation<E> = ElementMaskComputation.And(this, other)
+infix fun <E: Number> ElementMaskComputation<E>.or(other: ElementMaskComputation<E>): ElementMaskComputation<E> = ElementMaskComputation.Or(this, other)
+
 infix fun <E: Number> ElementComputation<E>.`==`(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.EQ(this, other)
 infix fun <E: Number> ElementComputation<E>.`!=`(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.NE(this, other)
+infix fun <E: Number> ElementComputation<E>.gt(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.GT(this, other)
+infix fun <E: Number> ElementComputation<E>.ge(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.GE(this, other)
+infix fun <E: Number> ElementComputation<E>.lt(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.LT(this, other)
+infix fun <E: Number> ElementComputation<E>.le(other: ElementComputation<E>): ElementMaskComputation<E> = VectorOperators.LE(this, other)

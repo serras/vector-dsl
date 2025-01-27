@@ -33,6 +33,10 @@ fun <E: Number> ElementComputation<E>.toComputation(): VectorComputation<E> = wh
 fun <E: Number> ElementMaskComputation<E>.toComputation(): VectorMaskComputation<E> = when (this) {
     is ElementMaskComputation.Not ->
         VectorMaskComputation.Not(argument.toComputation())
+    is ElementMaskComputation.And ->
+        VectorMaskComputation.And(left.toComputation(), right.toComputation())
+    is ElementMaskComputation.Or ->
+        VectorMaskComputation.Or(left.toComputation(), right.toComputation())
     is ElementMaskComputation.Comparison ->
         VectorMaskComputation.ComparisonBinary(operator, left.toComputation(), right.toComputation())
 }

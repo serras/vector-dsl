@@ -45,6 +45,8 @@ fun <E: Number> VectorComputation<E>.executeLane(species: VectorSpecies<E>, inde
 
 fun <E: Number> VectorMaskComputation<E>.executeLane(species: VectorSpecies<E>, index: Int): VectorMask<E> = when (this) {
     is VectorMaskComputation.Not -> argument.executeLane(species, index).not()
+    is VectorMaskComputation.And -> left.executeLane(species, index).and(right.executeLane(species, index))
+    is VectorMaskComputation.Or -> left.executeLane(species, index).or(right.executeLane(species, index))
     is VectorMaskComputation.ComparisonBinary -> left.executeLane(species, index).compare(operator, right.executeLane(species, index))
 }
 
@@ -66,7 +68,9 @@ fun VectorComputation<Float>.executeSingle(index: Int): Float {
             val rightResult = right.executeSingle(index)
             when (operator) {
                 VectorOperators.ADD -> leftResult + rightResult
+                VectorOperators.SUB -> leftResult - rightResult
                 VectorOperators.MUL -> leftResult * rightResult
+                VectorOperators.DIV -> leftResult / rightResult
                 else -> error("Unsupported binary operator $operator")
             }
         }
@@ -75,12 +79,18 @@ fun VectorComputation<Float>.executeSingle(index: Int): Float {
 
 fun VectorMaskComputation<Float>.executeSingle(index: Int): Boolean = when (this) {
     is VectorMaskComputation.Not -> argument.executeSingle(index).not()
+    is VectorMaskComputation.And -> left.executeSingle(index) && right.executeSingle(index)
+    is VectorMaskComputation.Or -> left.executeSingle(index) || right.executeSingle(index)
     is VectorMaskComputation.ComparisonBinary -> {
         val leftResult = left.executeSingle(index)
         val rightResult = right.executeSingle(index)
         when (operator) {
             VectorOperators.EQ -> leftResult == rightResult
             VectorOperators.NE -> leftResult != rightResult
+            VectorOperators.GT -> leftResult > rightResult
+            VectorOperators.GE -> leftResult >= rightResult
+            VectorOperators.LT -> leftResult < rightResult
+            VectorOperators.LE -> leftResult <= rightResult
             else -> error("Unsupported binary operator $operator")
         }
     }

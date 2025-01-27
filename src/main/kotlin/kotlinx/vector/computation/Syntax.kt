@@ -28,6 +28,14 @@ sealed interface VectorMaskComputation<E: Number> {
     data class Not<E: Number>(
         val argument: VectorMaskComputation<E>
     ) : VectorMaskComputation<E>
+    data class And<E: Number>(
+        val left: VectorMaskComputation<E>,
+        val right: VectorMaskComputation<E>
+    ) : VectorMaskComputation<E>
+    data class Or<E: Number>(
+        val left: VectorMaskComputation<E>,
+        val right: VectorMaskComputation<E>
+    ) : VectorMaskComputation<E>
     data class ComparisonBinary<E: Number>(
         val operator: VectorOperators.Comparison,
         val left: VectorComputation<E>,
@@ -44,23 +52,28 @@ fun <E: Number> constant(value: Long): VectorComputation<E> = VectorComputation.
 
 operator fun <E: Number> VectorOperators.Unary.invoke(argument: VectorComputation<E>): VectorComputation<E> =
     VectorComputation.LanewiseUnary(this, argument, null)
-
 operator fun <E: Number> VectorOperators.Unary.invoke(argument: VectorComputation<E>, mask: VectorMaskComputation<E>): VectorComputation<E> =
     VectorComputation.LanewiseUnary(this, argument, mask)
-
 operator fun <E: Number> VectorOperators.Binary.invoke(left: VectorComputation<E>, right: VectorComputation<E>): VectorComputation<E> =
     VectorComputation.LanewiseBinary(this, left, right, null)
-
 operator fun <E: Number> VectorOperators.Binary.invoke(left: VectorComputation<E>, right: VectorComputation<E>, mask: VectorMaskComputation<E>): VectorComputation<E> =
     VectorComputation.LanewiseBinary(this, left, right, mask)
-
 operator fun <E: Number> VectorOperators.Comparison.invoke(left: VectorComputation<E>, right: VectorComputation<E>): VectorMaskComputation<E> =
     VectorMaskComputation.ComparisonBinary(this, left, right)
 
 operator fun <E: Number> VectorComputation<E>.plus(other: VectorComputation<E>): VectorComputation<E> = VectorOperators.ADD(this, other)
+operator fun <E: Number> VectorComputation<E>.minus(other: VectorComputation<E>): VectorComputation<E> = VectorOperators.SUB(this, other)
 operator fun <E: Number> VectorComputation<E>.times(other: VectorComputation<E>): VectorComputation<E> = VectorOperators.MUL(this, other)
+operator fun <E: Number> VectorComputation<E>.div(other: VectorComputation<E>): VectorComputation<E> = VectorOperators.DIV(this, other)
 operator fun <E: Number> VectorComputation<E>.unaryMinus(): VectorComputation<E> = VectorOperators.NEG(this)
 
 operator fun <E: Number> VectorMaskComputation<E>.not(): VectorMaskComputation<E> = VectorMaskComputation.Not(this)
+infix fun <E: Number> VectorMaskComputation<E>.and(other: VectorMaskComputation<E>): VectorMaskComputation<E> = VectorMaskComputation.And(this, other)
+infix fun <E: Number> VectorMaskComputation<E>.or(other: VectorMaskComputation<E>): VectorMaskComputation<E> = VectorMaskComputation.Or(this, other)
+
 infix fun <E: Number> VectorComputation<E>.`==`(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.EQ(this, other)
 infix fun <E: Number> VectorComputation<E>.`!=`(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.NE(this, other)
+infix fun <E: Number> VectorComputation<E>.gt(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.GT(this, other)
+infix fun <E: Number> VectorComputation<E>.ge(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.GE(this, other)
+infix fun <E: Number> VectorComputation<E>.lt(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.LT(this, other)
+infix fun <E: Number> VectorComputation<E>.le(other: VectorComputation<E>): VectorMaskComputation<E> = VectorOperators.LE(this, other)
